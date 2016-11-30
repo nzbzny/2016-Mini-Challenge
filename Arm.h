@@ -7,15 +7,24 @@
 
 #include "WPILib.h"
 #include "Constants.h"
+#include "Pneumatics.h"
 
 #ifndef SRC_ARM_H
 #define SRC_ARM_H
 
 class Arm {
-	//define objects
+  Arm();
+	void raise();
+  void lower();
+  void stop();
+  void gripOpen();
+  void gripClose();
 
 public:
-
+  Pneumatics gripper;
+  Talon motor;
+  DigitalInput upperSwitch;
+  DigitalInput lowerSwitch;
 };
 
 #endif
