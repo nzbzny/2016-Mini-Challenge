@@ -1,9 +1,11 @@
 #include "Robot.h"
 
 Robot::Robot() :
-	robotDrive(Constants::driveLeftPin, Constants::driveRightPin),
+	position(),
+	robotDrive(Constants::driveLeftPin, Constants::driveRightPin, position),
 	driveStick(Constants::driveStickChannel),
-	ultrasonic(Constants::ultrasonicPin),
+	frontUltrasonic(Constants::frontUltrasonicPin),
+	backUltrasonic(Constants::backUltrasonicPin),
 	compressor(Constants::compressorPin) //canbus number
 {
 	robotDrive.SetExpiration(0.1); //safety feature
@@ -13,6 +15,8 @@ void Robot::OperatorControl() //teleop code
 {
 	robotDrive.SetSafetyEnabled(false);
 	compressor.Start();
+
+	//track.releaseSmallBalls();
 
 	while(IsOperatorControl() && IsEnabled())
 	{
@@ -24,16 +28,45 @@ void Robot::OperatorControl() //teleop code
 	compressor.Stop();
 }
 
+
+
 void Robot::Autonomous() {
 	//use navx mxp
 	compressor.Start();
-	float distanceToCheezeBalls;
-	distanceToCheezeBalls = ultrasonic.GetVoltage(); //multiply by whatever the factor constant is - will probably need to be found through testing if I remember correctly
 
-	robotDrive.TankDriveStraight(0,0); //float speed, float fieldAngle
+	//track.lock();
 
+	int fs = 0;
+	while (frontUltrasonic.getVoltage() * Constants::ultrasonicVoltageToInches > Constants::minDistanceToCheeseballs && fs < 500)
+	{
 
-	//do stuff
+		robotDrive.TankDriveStraight(.5,0);
+		fs++;
+		Wait(.01);
+
+	}
+	robotDrive.TankDriveSpeed(0,0);
+
+	//arm.down();
+
+	//gripper.grab();
+
+	//arm.up(); (separate thread probably)
+
+	Wait(1);//Temporary so robot doesn't flip
+
+	fs = 0;
+	while (frontUltrasonic.getVoltage() * Constants::ultrasonicVoltageToInches > Constants::minDistanceToCheeseballs && fs < 500)
+	{
+
+		robotDrive.TankDriveStraight(.5,180);
+		fs++;
+		Wait(.01);
+
+	}
+	robotDrive.TankDriveSpeed(0,0);
+
+	//track.releaseBigBalls();
 
 	compressor.Stop();
 }

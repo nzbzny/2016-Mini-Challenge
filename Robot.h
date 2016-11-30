@@ -1,16 +1,23 @@
 #include "WPILib.h"
 
 #include "Constants.h"
-#include "Shooter.h"
+//#include "Arm.h"
+#include "DriveTrain.h"
+#include "Position.h"
+//#include "Gripper.h"
+//#include "Track.h"
 
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 
 class Robot : public SampleRobot {
-	RobotDrive robotDrive;
+	DriveTrain robotDrive;
+	//Arm arm;
+	//ripper gripper;
+	//Track track;
+	Position position;
 	Joystick driveStick;
-	Shooter shooter;
-	AnalogInput ultrasonic;
+	AnalogInput frontUltrasonic, backUltrasonic;
 	Compressor compressor;
 public:
 	Robot();

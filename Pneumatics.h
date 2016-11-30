@@ -12,12 +12,15 @@
 #define SRC_PNEUMATICS_H
 
 class Pneumatics {
-	//define objects
+private:
+  DoubleSolenoid pneumaticController;
 
 public:
-  Pneumatics(UINT32 InSoleChannel, UINT32 OutSoleChannel);
-	void Set();
-  void Get();
+  Pneumatics(UINT32 InSoleChannel, UINT32 OutSoleChannel):
+	  pneumaticController(InSoleChannel, OutSoleChannel)
+  {}
+  void Set(bool state);
+  bool Get();
 };
 
 #endif

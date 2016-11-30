@@ -8,7 +8,10 @@ namespace Constants {
 	static constexpr int driveStickChannel = 0;
 
 	//Sensors
-	static constexpr int ultrasonicPin = 99;
+	static constexpr int frontUltrasonicPin = 99;
+	static constexpr int backUltrasonicPin = 98;
+	static constexpr int ultrasonicVoltageToInches = 148;
+	static constexpr int minDistanceToCheeseballs = 12;
 
 	//Pneumatics
 	static constexpr int compressorPin = 99; //compressor canbus number
