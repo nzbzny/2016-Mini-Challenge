@@ -19,7 +19,14 @@ namespace Constants {
 	//Joysticks
 	static constexpr int PS4LeftJoystick = 1;
 	static constexpr int PS4RightJoystick = 5;
-	static constexpr int L2 = 3;
+	static constexpr int raiseArmButton = 0;
+	static constexpr int lowerArmButton = 0;
+	static constexpr int grabContainerButton = 0;
+	static constexpr int releaseContainerButton = 0;
+	static constexpr int releaseBigBallsButton = 0;
+	static constexpr int releaseSmallBallsButton = 0;
+	static constexpr int releaseAllBallsButton = 0;
+	static constexpr int lockBallsButton = 0;
 
 	//Arm
 	static constexpr int gripperInSole = 99;
