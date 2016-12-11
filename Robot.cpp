@@ -2,7 +2,7 @@
 
 Robot::Robot() :
 	position(),
-	robotDrive(Constants::driveLeftPin, Constants::driveRightPin, position),
+	robotDrive(Constants::driveLeftPin, Constants::driveRightPin, &position),
 	arm(),
 	track(),
 	driveStick(Constants::driveStickChannel),
@@ -18,35 +18,27 @@ void Robot::OperatorControl() //teleop code
 	robotDrive.SetSafetyEnabled(false);
 	compressor.Start();
 
-	track.openBottom();
+	track.bottom(!track.getBottom());
 
 	while(IsOperatorControl() && IsEnabled())
 	{
+		float throttle = driveStick.GetRawAxis(Constants::throttleAxis);
 		float leftValue = throttle * driveStick.GetRawAxis(Constants::PS4LeftJoystick);
 		float rightValue = throttle * driveStick.GetRawAxis(Constants::PS4RightJoystick);
 		robotDrive.TankDriveSpeed(leftValue, rightValue);
-		if (driveStick.getRawButton(Constants::raiseArmButton))
+		if (driveStick.GetRawButton(Constants::raiseArmButton))
 			arm.raise();
-		if (driveStick.getRawButton(Constants::lowerArmButton))
+		if (driveStick.GetRawButton(Constants::lowerArmButton))
 			arm.lower();
-		if (driveStick.getRawButton(Constants::grabContainerButton))
-			arm.close();
-		if (driveStick.getRawButton(Constants::releaseContainerButton))
-			arm.open();
-		if (driveStick.getRawButton(Constants::releaseBigBallsButton))
-			track.openTop();
-		if (driveStick.getRawButton(Constants::releaseSmallBallsButton))
-			track.openBottom();
-		if (driveStick.getRawButton(Constants::releaseAllBallsButton))
-			{
-				track.openTop();
-				track.openBottom();
-			}
-		if (driveStick.getRawButton(Constants::lockBallsButton))
-			{
-				track.closeTop();
-				track.closeBottom();
-			}
+		if (driveStick.GetRawButton(Constants::gripButton)) {
+			arm.grip(!arm.getGrip()); //TODO: may need to flip
+		}
+		if (driveStick.GetRawButton(Constants::topTrackButton)) {
+			track.top(!track.getTop()); //TODO: may need to flip
+		}
+		if (driveStick.GetRawButton(Constants::bottomTrackButton)) {
+			track.bottom(!track.getBottom()); //TODO: may need to flip
+		}
 	}
 
 	compressor.Stop();
@@ -63,7 +55,7 @@ void Robot::Autonomous() {
 	//track.lock();
 
 	int fs = 0;
-	while (frontUltrasonic.getVoltage() * Constants::ultrasonicVoltageToInches > Constants::minDistanceToCheeseballs && fs < 500)
+	while (frontUltrasonic.GetVoltage() * Constants::ultrasonicVoltageToInches > Constants::minDistanceToCheeseballs && fs < 500)
 	{
 
 		robotDrive.TankDriveStraight(.5,0);
@@ -74,17 +66,21 @@ void Robot::Autonomous() {
 	robotDrive.TankDriveSpeed(0,0);
 
 	arm.lower();
-	
+
+	Wait(1);
+
 	arm.stop();
 
-	gripper.close();
+	arm.grip(!arm.getGrip());
 
 	arm.raise();
-	
+
+	Wait(1);
+
 	arm.stop();
 
 	fs = 0;
-	while (frontUltrasonic.getVoltage() * Constants::ultrasonicVoltageToInches > Constants::minDistanceToCheeseballs && fs < 500)
+	while (frontUltrasonic.GetVoltage() * Constants::ultrasonicVoltageToInches > Constants::minDistanceToCheeseballs && fs < 500)
 	{
 
 		robotDrive.TankDriveStraight(.5,180);
@@ -94,7 +90,7 @@ void Robot::Autonomous() {
 	}
 	robotDrive.TankDriveSpeed(0,0);
 
-	track.openTop();
+	track.top(!track.getTop());
 
 	compressor.Stop();
 	robotDrive.SetSafetyEnabled(true);

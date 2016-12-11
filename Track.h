@@ -13,15 +13,15 @@
 #define SRC_Track_H
 
 class Track {
-  Track();
-  void openBottom();
-  void closeBottom();
-  void openTop();
-  void closeTop();
+	Pneumatics bottomTrack;
+	Pneumatics topTrack;
 
 public:
-  Pneumatics bottomTrack;
-  Pneumatics topTrack;
+	Track();
+	void bottom(bool state);
+	void top(bool state);
+	bool getBottom();
+	bool getTop();
 };
 
 #endif

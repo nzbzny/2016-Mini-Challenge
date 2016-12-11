@@ -1,16 +1,25 @@
 #include "Pneumatics.h"
 
-Pneumatics::Pneumatics (UINT32 InSoleChannel, UINT32 OutSoleChannel):
-  InSole (InSoleChannel),
-  OutSole (OutSoleChannel)
+Pneumatics::Pneumatics(UINT32 InSoleChannel, UINT32 OutSoleChannel):
+	InSole (InSoleChannel),
+	OutSole (OutSoleChannel)
 {    }
 
-void Pneumatic::Set (bool state)
+void Pneumatics::set (bool state)
 {
-  pneumaticController.Set(state+1);
+	if (InSole.Get())
+	{
+		InSole.Set (!state);
+		OutSole.Set (state);
+	}
+	else
+	{
+		OutSole.Set (state);
+		InSole.Set (!state);
+	}
 }
 
-bool Pneumatic::Get ()
+bool Pneumatics::get ()
 {
-  return pneumaticController.Get() - 1;
+		return OutSole.Get();
 }

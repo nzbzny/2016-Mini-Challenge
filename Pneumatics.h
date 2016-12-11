@@ -13,14 +13,13 @@
 
 class Pneumatics {
 private:
-  DoubleSolenoid pneumaticController;
+  Solenoid InSole;
+  Solenoid OutSole;
 
 public:
-  Pneumatics(UINT32 InSoleChannel, UINT32 OutSoleChannel):
-	  pneumaticController(InSoleChannel, OutSoleChannel)
-  {}
-  void Set(bool state);
-  bool Get();
+  Pneumatics(UINT32 InSoleChannel, UINT32 OutSoleChannel);
+  void set(bool state);
+  bool get();
 };
 
 #endif

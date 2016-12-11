@@ -19,6 +19,7 @@ class DriveTrain : public RobotDrive
 	Position *position;
 public:
 	DriveTrain(uint32_t leftMasterDeviceID, uint32_t leftSlaveDeviceID, uint32_t rightMasterDeviceID, uint32_t rightSlaveDeviceID, Position *position_);
+	DriveTrain(uint32_t leftMotorID, uint32_t rightMotorID, Position *position_);
 	void Enable();
 	void Disable();
 	void TurnToAngle(float angle);

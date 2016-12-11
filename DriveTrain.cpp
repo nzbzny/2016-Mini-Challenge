@@ -39,8 +39,20 @@ DriveTrain::DriveTrain(uint32_t leftMasterDeviceID, uint32_t leftSlaveDeviceID, 
 	rightMaster.SetInverted(true);
 
 	rightSlave.SetModeSelect(CanTalonSRX::kMode_SlaveFollower);
-	rightSlave.Set(Constants::driveRightMasterID);
+	rightSlave.Set(rightMasterDeviceID);
 	rightSlave.SetDemand(rightMasterDeviceID);
+
+	SmartDashboard::PutNumber("Min Motor Power", Constants::drivePIDMinSpeed);
+}
+
+DriveTrain::DriveTrain(uint32_t leftMotorID, uint32_t rightMotorID, Position *position_) :
+	RobotDrive(leftMaster, rightMaster),
+	leftMaster(leftMotorID),
+	rightMaster(rightMotorID),
+	position(position_)
+{
+	leftMaster.SetControlMode(CANTalon::ControlMode::kSpeed);
+	rightMaster.SetControlMode(CANTalon::ControlMode::kSpeed);
 }
 
 void DriveTrain::Enable()
@@ -98,7 +110,7 @@ void DriveTrain::TurnToAngle(float absAngle)
 	float delta_t = 0.02;
 	unsigned int failsafeMax = static_cast<unsigned int>(3.0 / delta_t); // Two seconds timeout
 
-	while(abs(error) > Constants::drivePIDepsilon && failsafe < failsafeMax)
+	while(abs(error) > Constants::drivePIDepsilon && failsafe <= failsafeMax)
 	{
 		float motorOutput = scaleOutput(k_P * error);
 		SmartDashboard::PutNumber("TurnPower", motorOutput);
@@ -116,25 +128,27 @@ void DriveTrain::TurnToAngle(float absAngle)
 		           ", Gyro Angle: "  << currentAngle <<
 				   ", Motor Power: " << motorOutput << std::endl;
 
-	}
-
-	if (failsafe == failsafeMax)
+	if (failsafe >= failsafeMax)
 	{
 		SmartDashboard::PutString("status", "driveTrain.TurnToAngle() failsafe hit");
+		SmartDashboard::PutBoolean("failsafe", false);
 		logfile << "Failsafe hit!" << std::endl;
+		TankDriveSpeed(0, 0);
+		return;
 	}
 	else
 	{
 		SmartDashboard::PutString("status", "driveTrain.TurnToAngle() completed");
+		SmartDashboard::PutBoolean("failsafe", true);
 		logfile << "Successfully completed turn." << std::endl;
 	}
-
+	}
 	TankDriveSpeed(0, 0);
 }
 
 void DriveTrain::TurnToRelativeAngle(float angle)
 {
-	TurnToAngle(angle + position->GetAngleDegrees());
+	AutoTurnToAngle(fmod(angle + position->GetAngleDegreesPositive(), 360));
 }
 
 void DriveTrain::TankDriveStraight(float speed, float fieldAngle)
@@ -259,31 +273,41 @@ void DriveTrain::TankDriveSpeed(float leftspeed, float rightspeed)
 
 void DriveTrain::AutoTurnToAngle(float angle) {
 	int failsafe = 0;
-	int error = CalculateAutoTurnError(angle);
+	float error = CalculateAutoTurnError(angle);
 	float motorOutput = 0;
-	while (abs(error) > 3 && failsafe < 400) {
-		if (error > 90) {
+	float minmotorpower = SmartDashboard::GetNumber("Min Motor Power", Constants::drivePIDMinSpeed);
+	while (abs(error) > 3.0 && failsafe < 200) {
+		if (abs(error) >= 90.0) {
 			motorOutput = Constants::drivePIDMaxSpeed;
-		} else if (error < 90 && error > 20) {
-			motorOutput = (Constants::drivePIDMaxSpeed - Constants::drivePIDMinSpeed) / 70 * (error - 20) + Constants::drivePIDMinSpeed;
-		} else if (error < 20) {
-			motorOutput = Constants::drivePIDMinSpeed;
+		} else if (abs(error) < 90.0 && abs(error) > 20.0) {
+			motorOutput = ((Constants::drivePIDMaxSpeed - minmotorpower) * ((abs(error) - 20.0) / 70.0)) + minmotorpower;
+		} else if (abs(error) <= 20.0) {
+			motorOutput = minmotorpower;
 		}
+		if (error < 0)
+			motorOutput *= -1;
+		SmartDashboard::PutNumber("jj Motor Output", motorOutput);
 		TankDriveSpeed(motorOutput, -motorOutput);
 		Wait(.05);
-		SmartDashboard::PutNumber("Auto Turn Error:", error);
-		std::cout << "Error: " << error << "\n";
 		error = CalculateAutoTurnError(angle);
+		SmartDashboard::PutNumber("jj Auto Turn Error:", error);
+		SmartDashboard::PutNumber("jj Failsafe", failsafe);
+		SmartDashboard::PutNumber("jj Angle", angle);
+		std::cout << "Error: " << error << "\n";
 		failsafe++;
-	}
+	}  TankDriveSpeed(0.0, 0.0);
 }
 
 float DriveTrain::CalculateAutoTurnError(float angle) {
 	float error;
-	error = angle - position->GetAngleDegreesPositive();
-	if (error < 0) {
+	error = angle - position->GetAngleDegrees();
+	SmartDashboard::PutNumber("jj Angle degrees", position->GetAngleDegrees());
+	if (error > 180) {
+		error -= 360;
+	}
+	else if (error < -180)
+	{
 		error += 360;
-		//error = -1 * error;
 	}
 	return error;
 }

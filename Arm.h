@@ -13,18 +13,18 @@
 #define SRC_ARM_H
 
 class Arm {
-  Arm();
-	void raise();
-  void lower();
-  void stop();
-  void gripOpen();
-  void gripClose();
+	Pneumatics gripper;
+	Talon motor;
+	DigitalInput upperSwitch;
+	DigitalInput lowerSwitch;
 
 public:
-  Pneumatics gripper;
-  Talon motor;
-  DigitalInput upperSwitch;
-  DigitalInput lowerSwitch;
+	Arm();
+	void raise();
+	void lower();
+	void stop();
+	void grip(bool state);
+	bool getGrip();
 };
 
 #endif

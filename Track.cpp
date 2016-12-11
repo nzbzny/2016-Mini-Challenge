@@ -1,22 +1,22 @@
 #include "Track.h"
 
-Track::Track() {
+Track::Track() :
   bottomTrack(Constants::bottomTrackInSole, Constants::bottomTrackOutSole),
   topTrack(Constants::topTrackInSole, Constants::topTrackOutSole)
+{}
+
+void Track::bottom(bool state) {
+  bottomTrack.set(state);
 }
 
-void Track::openBottom() {
-  bottomTrack.Set(true);
+void Track::top(bool state) {
+  topTrack.set(state);
 }
 
-void Track::closeBottom() {
-  bottomTrack.Set(false);
+bool Track::getBottom() {
+  return bottomTrack.get();
 }
 
-void Track::openTop() {
-  topTrack.Set(true);
-}
-
-void Track::closeTop() {
-  topTrack.Set(false);
+bool Track::getTop() {
+  return topTrack.get();
 }

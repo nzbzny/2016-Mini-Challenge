@@ -10,10 +10,10 @@
 #define SRC_ROBOT_H_
 
 class Robot : public SampleRobot { 
+	Position position;
 	DriveTrain robotDrive;
 	Arm arm;
 	Track track;
-	Position position;
 	Joystick driveStick;
 	AnalogInput frontUltrasonic, backUltrasonic;
 	Compressor compressor;
