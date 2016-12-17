@@ -51,8 +51,8 @@ DriveTrain::DriveTrain(uint32_t leftMotorID, uint32_t rightMotorID, Position *po
 	rightMaster(rightMotorID),
 	position(position_)
 {
-	leftMaster.SetControlMode(CANTalon::ControlMode::kSpeed);
-	rightMaster.SetControlMode(CANTalon::ControlMode::kSpeed);
+	leftMaster.SetControlMode(CANTalon::ControlMode::kPercentVbus);
+	rightMaster.SetControlMode(CANTalon::ControlMode::kPercentVbus);
 }
 
 void DriveTrain::Enable()

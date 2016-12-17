@@ -20,9 +20,7 @@ class Arm {
 
 public:
 	Arm();
-	void raise();
-	void lower();
-	void stop();
+	void move(int speed);
 	void grip(bool state);
 	bool getGrip();
 };

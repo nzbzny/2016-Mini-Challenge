@@ -9,12 +9,13 @@
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 
-class Robot : public SampleRobot { 
+class Robot : public SampleRobot {
 	Position position;
 	DriveTrain robotDrive;
 	Arm arm;
 	Track track;
 	Joystick driveStick;
+	Joystick operatorStick;
 	AnalogInput frontUltrasonic, backUltrasonic;
 	Compressor compressor;
 public:

@@ -8,22 +8,12 @@ Arm::Arm() :
 {}
 
 
-void Arm::raise() {
-  motor.Set(.25);
-  if (upperSwitch.Get()) {
-      motor.Set(0);
+void Arm::move(int speed) {
+  if (upperSwitch.Get() || lowerSwitch.Get()) {
+    arm.Set(0);
+    return;
   }
-}
-
-void Arm::lower() {
-  motor.Set(-.25);
-  if (lowerSwitch.Get()) {
-    motor.Set(0);
-  }
-}
-
-void Arm::stop() {
-  motor.Set(0);
+  arm.Set(speed);
 }
 
 void Arm::grip(bool state) {

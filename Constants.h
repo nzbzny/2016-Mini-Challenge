@@ -7,6 +7,8 @@ namespace Constants {
 	static constexpr int driveRightPin	= 0; //TODO: find out
 	static constexpr int driveStickChannel = 0;
 
+	static constexpr int operatorStickChannel = 1;
+
 
 	//Sensors
 	static constexpr int frontUltrasonicPin = 0;
@@ -21,11 +23,15 @@ namespace Constants {
 	static constexpr int PS4LeftJoystick = 1;
 	static constexpr int PS4RightJoystick = 5;
 	static constexpr int throttleAxis = 3;
-	static constexpr int raiseArmButton = 5;
-	static constexpr int lowerArmButton = 6;
-	static constexpr int gripButton = 1;
-	static constexpr int topTrackButton = 3;
-	static constexpr int bottomTrackButton = 4;
+	static constexpr int raiseArmButton = 7;
+	static constexpr int lowerArmButton = 8;
+	static constexpr int stopArmButton = 9;
+	static constexpr int gripOpenButton = 1;
+	static constexpr int gripCloseButton = 2;
+	static constexpr int topTrackOpenButton = 3;
+	static constexpr int topTrackCloseButton = 4;
+	static constexpr int bottomTrackOpenButton = 5;
+	static constexpr int bottomTrackCloseButton = 6;
 
 	//Arm
 	static constexpr int gripperInSole = 4;

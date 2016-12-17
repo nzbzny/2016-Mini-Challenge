@@ -6,6 +6,7 @@ Robot::Robot() :
 	arm(),
 	track(),
 	driveStick(Constants::driveStickChannel),
+	operatorStick(Constants::operatorStickChannel),
 	frontUltrasonic(Constants::frontUltrasonicPin),
 	backUltrasonic(Constants::backUltrasonicPin),
 	compressor(Constants::compressorPin) //canbus number
@@ -17,30 +18,40 @@ void Robot::OperatorControl() //teleop code
 {
 	robotDrive.SetSafetyEnabled(false);
 	compressor.Start();
-
-	track.bottom(!track.getBottom());
+	robotDrive.Enable();
 
 	while(IsOperatorControl() && IsEnabled())
 	{
-		float throttle = driveStick.GetRawAxis(Constants::throttleAxis);
+		float throttle = 1;
+		//float throttle = driveStick.GetRawAxis(Constants::throttleAxis);
 		float leftValue = throttle * driveStick.GetRawAxis(Constants::PS4LeftJoystick);
 		float rightValue = throttle * driveStick.GetRawAxis(Constants::PS4RightJoystick);
+		float armAngleInput = .3 * -operatorStick.GetRawAxis(1); //left joystick
+		armAngleInput = abs(armAngleInput) > 0.005 ? armAngleInput : 0.0;
+		arm.move(shooterAngleInput);
 		robotDrive.TankDriveSpeed(leftValue, rightValue);
-		if (driveStick.GetRawButton(Constants::raiseArmButton))
-			arm.raise();
-		if (driveStick.GetRawButton(Constants::lowerArmButton))
-			arm.lower();
-		if (driveStick.GetRawButton(Constants::gripButton)) {
-			arm.grip(!arm.getGrip()); //TODO: may need to flip
+
+		if (operatorStick.GetRawButton(Constants::gripOpenButton)) {
+			arm.grip(true); //TODO: may need to flip
 		}
-		if (driveStick.GetRawButton(Constants::topTrackButton)) {
-			track.top(!track.getTop()); //TODO: may need to flip
+		if (operatorStick.GetRawButton(Constants::gripCloseButton)) {
+			arm.grip(false); //TODO: may need to flip
 		}
-		if (driveStick.GetRawButton(Constants::bottomTrackButton)) {
-			track.bottom(!track.getBottom()); //TODO: may need to flip
+		if (operatorStick.GetRawButton(Constants::topTrackOpenButton)) {
+			track.top(true); //TODO: may need to flip
+		}
+		if (operatorStick.GetRawButton(Constants::topTrackCloseButton)) {
+			track.top(false); //TODO: may need to flip
+		}
+		if (operatorStick.GetRawButton(Constants::bottomTrackOpenButton)) {
+			track.bottom(true); //TODO: may need to flip
+		}
+		if (operatorStick.GetRawButton(Constants::bottomTrackCloseButton)) {
+			track.bottom(false); //TODO: may need to flip
 		}
 	}
-
+	
+	robotDrive.Disable();
 	compressor.Stop();
 	robotDrive.SetSafetyEnabled(true);
 }
@@ -51,6 +62,7 @@ void Robot::Autonomous() {
 	//use navx mxp
 	robotDrive.SetSafetyEnabled(false);
 	compressor.Start();
+	robotDrive.Enable();
 
 	//track.lock();
 
@@ -71,13 +83,13 @@ void Robot::Autonomous() {
 
 	arm.stop();
 
-	arm.grip(!arm.getGrip());
+	arm.grip(true); //may need to flip
 
-	arm.raise();
+	arm.move(.25);
 
 	Wait(1);
 
-	arm.stop();
+	arm.move(0);
 
 	fs = 0;
 	while (frontUltrasonic.GetVoltage() * Constants::ultrasonicVoltageToInches > Constants::minDistanceToCheeseballs && fs < 500)
@@ -90,8 +102,9 @@ void Robot::Autonomous() {
 	}
 	robotDrive.TankDriveSpeed(0,0);
 
-	track.top(!track.getTop());
+	track.top(false);
 
+	robotDrive.Disable();
 	compressor.Stop();
 	robotDrive.SetSafetyEnabled(true);
 }
